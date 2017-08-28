@@ -1,13 +1,7 @@
-from Organize_Stats import get_data
 import numpy as np
 import matplotlib.pyplot as plt
 
-
-train_set_x_orig, train_set_y, test_set_x_orig, test_set_y,names = get_data()
-# x.shape = (dim,m)     y.shape = (1,m)
-
-
-
+#NOT USED
 def sigmoid(z):
     s = 1 / (1 + np.exp(-z))
     return(s)
@@ -19,10 +13,9 @@ def initialize_parameters(layer_dims):
     L = len(layer_dims)
 
     for l in range(1, L):
-
-        parameters['W' + str(l)] = np.random.randn(layer_dims[l], layer_dims[l - 1]) * 0.01
+        #Sets inital parameters with He initialization *np.sqrt(2/previous layer dimension)
+        parameters['W' + str(l)] = np.random.randn(layer_dims[l], layer_dims[l - 1]) * np.sqrt(2/layer_dims[l-1])
         parameters['b' + str(l)] = np.zeros((layer_dims[l], 1))
-
     return(parameters)
 
 
@@ -33,14 +26,14 @@ def linear_forward(A,W,b):
     cache = (A,W,b)
     return(Z,cache)
 
-def relu(Z):
+def leaky_relu(Z):
     a = np.maximum(Z,0.00001*Z)
-    return(a,[Z])
+    return(a)
 
 def linear_activation_forward(A_prev,W,b):
     Z, linear_cache = linear_forward(A_prev,W,b)
-    A, activation_cache = relu(Z)
-    cache = (linear_cache,activation_cache)
+    A = leaky_relu(Z)
+    cache = (linear_cache,Z)
     return(A,cache)
 
 
@@ -50,17 +43,17 @@ def L_model_forward(X, parameters):
 
     L = len(parameters) // 2
 
-    for l in range(1, L):
+    # Propogates forward using only relu activation functions
+    for l in range(1, L+1):
         A_prev = A
         A, cache = linear_activation_forward(A_prev, parameters["W" + str(l)], parameters["b" + str(l)])
         caches.append(cache)
-
-    AL, cache = linear_activation_forward(A, parameters["W" + str(L)], parameters["b" + str(L)])
-    caches.append(cache)
-
+    # AL is the output of the final layer
+    AL = A
     return AL, caches
 
 def compute_cost(AL,Y):
+    # Computes cost as sum of squared differences / 2*m
     m = Y.shape[1]
     cost = np.sum(np.square(AL - Y)) / (2 * m)
     cost = np.squeeze(cost)
@@ -75,20 +68,18 @@ def linear_backward(dZ,cache):
     db = np.sum(dZ, axis=1, keepdims=True) / m
 
     dA_prev = np.dot(W.T, dZ)
-
     return (dA_prev, dW, db)
 
-def relu_backward(dA,activation_cache):
-    Z = activation_cache[0]
+def leaky_relu_backward(dA,Z):
     Z[Z<0]=0.00001
     Z[Z>0]=1
     return(dA*Z)
 
 
 def linear_activation_backward(dA,cache):
-    linear_cache, activation_cache = cache
+    linear_cache, Z = cache
 
-    dZ = relu_backward(dA, activation_cache)
+    dZ = leaky_relu_backward(dA, Z)
     dA_prev, dW, db = linear_backward(dZ, linear_cache)
 
     return dA_prev, dW, db
@@ -100,22 +91,19 @@ def L_model_backward(AL, Y, caches):
     m = AL.shape[1]
     Y = Y.reshape(AL.shape)  # after this line, Y is the same shape as AL
 
-
+    # Change in cost with respect to output of final layer (for squared difference cost function)
     dAL = (AL-Y)
 
     current_cache = caches[L - 1]
     grads["dA" + str(L)], grads["dW" + str(L)], grads["db" + str(L)] = linear_activation_backward(dAL, current_cache)
 
-
     for l in reversed(range(L - 1)):
-
         current_cache = caches[l]
         dA_prev_temp, dW_temp, db_temp = linear_activation_backward(grads["dA" + str(l + 2)], current_cache)
 
         grads["dA" + str(l + 1)] = dA_prev_temp
         grads["dW" + str(l + 1)] = dW_temp
         grads["db" + str(l + 1)] = db_temp
-
     return grads
 
 
@@ -126,25 +114,22 @@ def update_parameters(parameters, grads, learning_rate):
         parameters["W" + str(l + 1)] = parameters["W" + str(l + 1)] - learning_rate * grads["dW" + str(l + 1)]
         parameters["b" + str(l + 1)] = parameters["b" + str(l + 1)] - learning_rate * grads["db" + str(l + 1)]
 
-
     return parameters
 
 
-def L_layer_model(X, Y, layers_dims, num_iterations, learning_rate=0.0003, print_cost=False):
-
+def L_layer_model(X, Y, layers_dims, num_iterations, learning_rate=0.001, print_cost=False):
+    # MAIN NEURAL NETWORK FUNCTION
     costs = []  # keep track of cost
     parameters = initialize_parameters(layers_dims)
 
     # Loop (gradient descent)
     for i in range(0, num_iterations):
-
         AL, caches = L_model_forward(X, parameters)
-
         cost = compute_cost(AL, Y)
         grads = L_model_backward(AL, Y, caches)
         parameters = update_parameters(parameters, grads, learning_rate)
 
-        if print_cost and i % 100 == 1:
+        if print_cost and i % 200 == 1:
             print("Cost after iteration %i: %f" % (i, cost))
         if print_cost and i % 5 == 1:
             costs.append(cost)
@@ -156,36 +141,9 @@ def L_layer_model(X, Y, layers_dims, num_iterations, learning_rate=0.0003, print
     plt.title("Learning rate =" + str(learning_rate))
     plt.show()
 
-    return parameters
+    return(parameters)
 
 def predict(parameters,X):
     AL, caches = L_model_forward(X,parameters)
     return(AL)
-
-layer1_dims = (train_set_x_orig.shape[0])
-layers_dims = [layer1_dims, 30,20,10,5, 1]
-parameters = L_layer_model(train_set_x_orig, train_set_y, layers_dims, num_iterations=3301, print_cost=True)
-
-Y_prediction_test = predict(parameters, test_set_x_orig)
-Y_prediction_train = predict(parameters, train_set_x_orig)
-
-# Print train/test Errors
-print("train accuracy: {}".format(np.mean(np.abs(Y_prediction_train - train_set_y))))
-print("test accuracy: {}".format(np.mean(np.abs(Y_prediction_test - test_set_y))))
-
-
-
-
-predicted_points = np.concatenate((names.T,Y_prediction_test.T,test_set_y.T),axis=1)
-print(predicted_points)
-
-pny = predicted_points
-next_year = pny[pny[:,2].argsort(axis=0)[::-1]]
-with open("predictions2.txt","w") as f:
-    for row in next_year:
-        for x in row:
-
-            f.write(str(x))
-            f.write("\t")
-        f.write("\n")
 

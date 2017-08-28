@@ -1,4 +1,4 @@
-
+#NOT USING THIS FILE RIGHT NOW
 #######
 def propagate(w, b, X, y):
     m = X.shape[1]
