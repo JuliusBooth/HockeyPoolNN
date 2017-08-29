@@ -8,7 +8,7 @@ def get_years():
     for i in range(20072008,20162017,10001):
         years.append(pd.read_csv("count_data_files/" + str(i)  + "NHLCounts.csv"))
 
-    years.append(pd.read_csv("count_data_files/20152016NHLCounts.csv"))
+    years.append(pd.read_csv("count_data_files/NHL2016-17.csv"))
     return (years)
 
 def simplify(year):
@@ -71,7 +71,7 @@ def simplify_years(predict_next_year=False):
 
     # return data (+ last years stats if predict_next_year is True)
     if predict_next_year:
-        prediction = years[len(years)-1].fillna(0)
+        prediction = years[-1].fillna(0)
         return (data,prediction)
     else: return(data)
 
