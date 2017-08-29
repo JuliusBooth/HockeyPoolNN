@@ -18,12 +18,12 @@ def run_network(learning_rate, save=True):
     layer1_dims = (train_set_x_orig.shape[0])
 
     # Set the dimensions of network here
-    layers_dims = [layer1_dims,30,5,2, 1]
+    layers_dims = [layer1_dims, 10, 50, 10, 1]
 
     # Set the learning rate and # of iterations here.
     # Learning rate seems to need to go down the more layers there are.
     parameters = L_layer_model(train_set_x_orig, train_set_y, layers_dims,
-                               learning_rate=0.0001, num_iterations=5001, print_cost=True)
+                               learning_rate=0.0005, num_iterations=2000, print_cost=True)
 
     Y_prediction_test = predict(parameters, test_set_x_orig)
     Y_prediction_train = predict(parameters, train_set_x_orig)
@@ -48,6 +48,8 @@ def save_predictions(Y_test_actual,Y_prediction_test,names):
 
     next_year = predicted_points[predicted_points[:,(names.shape[0])].argsort(axis=0)[::-1]]
     with open("predictions2.txt","w") as f:
+        f.write("NAME OF PLAYER     SEASON     PREDICTED POINTS     ACTUAL POINTS")
+        f.write("\n")
         for row in next_year:
             for x in row:
                 f.write(str(x))
