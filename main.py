@@ -4,22 +4,6 @@ from neural_network import L_layer_model, predict
 
 
 
-def save_predictions(Y_test_actual,Y_prediction_test,names):
-    # Writes predictions to .txt file in order of predicted points high to low
-    # Second number is either actual points/82 player had
-    # or total points from 2016-17 if predicting 2017-18
-    predicted_points = np.concatenate((names.T,Y_prediction_test.T,Y_test_actual.T),axis=1)
-    print(predicted_points)
-
-    next_year = predicted_points[predicted_points[:,(names.shape[0])].argsort(axis=0)[::-1]]
-    with open("predictions2.txt","w") as f:
-        for row in next_year:
-            for x in row:
-                f.write(str(x))
-                f.write("\t")
-            f.write("\n")
-
-
 
 def run_network(save=True):
     # THE MAIN FUNCTION. SET ALL HYPER-PARAMETERS HERE.
@@ -36,12 +20,15 @@ def run_network(save=True):
     layer1_dims = (train_set_x_orig.shape[0])
 
     # Set the dimensions of network here
-    layers_dims = [layer1_dims,40,10,3, 1]
+
+    layers_dims = [layer1_dims, 10, 50, 10, 1]
+
 
     # Set the learning rate and # of iterations here.
     # Learning rate seems to need to go down the more layers there are.
     parameters = L_layer_model(train_set_x_orig, train_set_y, layers_dims,
-                               learning_rate=0.0004, num_iterations=8001, print_cost=True)
+                               learning_rate=0.0005, num_iterations=2000, print_cost=True)
+
 
     Y_prediction_test = predict(parameters, test_set_x_orig)
     Y_prediction_train = predict(parameters, train_set_x_orig)
@@ -56,6 +43,24 @@ def run_network(save=True):
         save_predictions(test_set_y,Y_prediction_test,names)
 
 
+
+
+def save_predictions(Y_test_actual,Y_prediction_test,names):
+    # Writes predictions to .txt file in order of predicted points high to low
+    # Second number is either actual points/82 player had
+    # or total points from 2016-17 if predicting 2017-18
+    predicted_points = np.concatenate((names.T,Y_prediction_test.T,Y_test_actual.T),axis=1)
+    print(predicted_points)
+
+    next_year = predicted_points[predicted_points[:,(names.shape[0])].argsort(axis=0)[::-1]]
+    with open("predictions2.txt","w") as f:
+        f.write("NAME OF PLAYER     SEASON     PREDICTED POINTS     ACTUAL POINTS")
+        f.write("\n")
+        for row in next_year:
+            for x in row:
+                f.write(str(x))
+                f.write("\t")
+            f.write("\n")
 
 
 if __name__== "__main__":
