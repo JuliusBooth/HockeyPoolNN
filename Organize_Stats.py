@@ -20,6 +20,7 @@ def get_data(predict_ny):
         train = data
         pred_val = "P"
     else:
+        # Change random state to get new test data
         train,test = train_test_split(data,test_size=0.2,random_state=2)
         pred_val = "P/82_next"
     return(train,test,pred_val)
