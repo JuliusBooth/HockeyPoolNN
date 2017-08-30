@@ -11,17 +11,17 @@ def get_data(predict_ny):
     else: data = simplify_years()
 
     # Filters out players who suck because stars probably don't develop like plugs
-    data = data.loc[(data["P"] > 30) | (data["P_prev"] > 30) | (data["P_2prev"] > 30)]
+    data = data.loc[(data["P"] > 30) | (data["P_prev"] > 30) | (data["P_2prev"] > 30)| (data["P_3prev"] > 30)]
 
     data["P/82_next"] = 82 * data["P_next"] / data["GP_next"]
 
     if predict_ny:
-        test = test.loc[(test["P"] > 30) | (test["P_prev"] > 30) | (test["P_2prev"] > 30)]
+        test = test.loc[(test["P"] > 30) | (test["P_prev"] > 30) | (test["P_2prev"] > 30)| (test["P_3prev"] > 30)]
         train = data
         pred_val = "P"
     else:
         # Change random state to get new test data
-        train,test = train_test_split(data,test_size=0.2,random_state=2)
+        train,test = train_test_split(data,test_size=0.20,random_state=1)
         pred_val = "P/82_next"
     return(train,test,pred_val)
 

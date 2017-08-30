@@ -24,25 +24,26 @@ def run_network(save=True):
     # THE MAIN FUNCTION. SET ALL HYPER-PARAMETERS HERE.
 
     # These are the input categories. It's important to list actual categories or NaNs are added to data and network breaks.
-    input_categories = ["GP","TOI","G","A1","A","P","iCF","iFF","iSF","ixG","iFOW",
-        "Avg.DIST","D?","Age","GP_prev","G_prev","P_prev","GP_2prev","G_2prev","P_2prev",
-                        "iCF_prev","iCF_2prev","ixG_prev","ixG_2prev"]
+    input_categories = ["GP","TOI","G","A1","A","P","iCF","iFF","iSF","iSCF","ixG","iFOW",
+        "Avg.DIST","D?","Age","GP_prev","G_prev","P_prev","iCF_prev","ixG_prev",
+                        "GP_2prev","G_2prev","P_2prev", "iCF_2prev","ixG_2prev",
+                        "GP_3prev","G_3prev","P_3prev","iCF_3prev","ixG_3prev"]
 
     # Gets all the data. Set predict_ny to True if you want to produce predictions for 2017-2018.
-    train_set_x_orig, train_set_y, test_set_x_orig, test_set_y,names = get_inputs(input_categories,predict_ny=True)
+    train_set_x_orig, train_set_y, test_set_x_orig, test_set_y,names = get_inputs(input_categories,predict_ny=False)
     # x.shape = (dim,m)     y.shape = (1,m)
 
     layer1_dims = (train_set_x_orig.shape[0])
 
     # Set the dimensions of network here
 
-    layers_dims = [layer1_dims, 50, 10, 10, 1]
+    layers_dims = [layer1_dims,40,20, 1]
 
 
     # Set the learning rate and # of iterations here.
     # Learning rate seems to need to go down the more layers there are.
     parameters = L_layer_model(train_set_x_orig, train_set_y, layers_dims,
-                               learning_rate=0.0005, num_iterations=2001, print_cost=True)
+                               learning_rate=0.001, num_iterations=4002, keep_prob=0.96, print_cost=True)
 
 
     Y_prediction_test = predict(parameters, test_set_x_orig)

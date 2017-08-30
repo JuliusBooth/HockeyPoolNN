@@ -33,6 +33,11 @@ def add_2prev_season_info(year,ppyear):
     ppyear_points = ppyear[["Player","GP","G","P","iCF","ixG"]]
     combined = pd.merge(year, ppyear_points, on=["Player"],suffixes=["","_2prev"],how="left")
     return (combined)
+def add_3prev_season_info(year,p3year):
+    # adds stats from two seasons ago
+    p3year_points = p3year[["Player","GP","G","P","iCF","ixG"]]
+    combined = pd.merge(year, p3year_points, on=["Player"],suffixes=["","_3prev"],how="left")
+    return (combined)
 
 def add_ages(year,date):
     # adds player ages in years
@@ -62,6 +67,8 @@ def simplify_years(predict_next_year=False):
         years[i] = add_previous_season_info(years[i],years[i-1])
     for i in range(2, len(years)):
         years[i] = add_2prev_season_info(years[i], years[i - 2])
+    for i in range(3, len(years)):
+        years[i] = add_3prev_season_info(years[i], years[i - 3])
     for i in range(len(years)-1):
         years[i] = add_next_year_info(years[i],years[i+1])
 
