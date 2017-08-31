@@ -20,6 +20,7 @@ def add_next_year_info(year,nextyear):
     #adds the points and games played the player had next season
     nextyear_info = nextyear[["Player","P","GP"]]
     combined = pd.merge(year, nextyear_info, on=["Player"],suffixes=["","_next"])
+    combined["P/82_next"] = 82 * combined["P_next"] / combined["GP_next"]
     return(combined)
 
 def add_previous_season_info(year,prevyear):
@@ -56,7 +57,7 @@ def get_birthdates():
         data = json.load(f)
     return(data)
 
-def simplify_years(predict_next_year=False):
+def simplify_years(years_ago,predict_next_year=False):
     #gets the data
     years = get_years()
 
@@ -73,15 +74,15 @@ def simplify_years(predict_next_year=False):
         years[i] = add_next_year_info(years[i],years[i+1])
 
     # stacks all dataframes except last years into one dataframe and get replace NaNs with 0s
-    data = pd.concat(years[:-1])
+    data = pd.concat(years[:-years_ago])
+
     data = data.fillna(0)
 
     # return data (+ last years stats if predict_next_year is True)
     if predict_next_year:
-        prediction = years[-1].fillna(0)
+        prediction = years[-years_ago].fillna(0)
         return (data,prediction)
     else: return(data)
 
 
 
-simplify_years()

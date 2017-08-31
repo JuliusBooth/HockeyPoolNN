@@ -4,38 +4,43 @@ import numpy as np
 from simplify_data import simplify_years
 
 
-def get_data(predict_ny):
+def get_data(years_ago,predict_ny):
     # Organizes data into train and test sets
     if predict_ny:
-        data,test = simplify_years(True)
-    else: data = simplify_years()
+        data,test = simplify_years(years_ago,True)
+    else: data = simplify_years(years_ago)
 
     # Filters out players who suck because stars probably don't develop like plugs
     data = data.loc[(data["P"] > 30) | (data["P_prev"] > 30) | (data["P_2prev"] > 30)| (data["P_3prev"] > 30)]
 
-    data["P/82_next"] = 82 * data["P_next"] / data["GP_next"]
+    # If a player had 0 points in 4 games the next season that's just going to confuse the algorithm
+    data = data.loc[data["GP_next"]>20]
+
+    pred_val = "P/82_next"
 
     if predict_ny:
         test = test.loc[(test["P"] > 30) | (test["P_prev"] > 30) | (test["P_2prev"] > 30)| (test["P_3prev"] > 30)]
         train = data
-        pred_val = "P"
+        if years_ago == 1:
+            pred_val = "P"
     else:
         # Change random state to get new test data
-        train,test = train_test_split(data,test_size=0.20,random_state=1)
-        pred_val = "P/82_next"
+        train,test = train_test_split(data,test_size=0.2,random_state=1)
+
     return(train,test,pred_val)
 
 
-def get_inputs(cols,predict_ny=False):
+def get_inputs(cols,years_ago,predict_ny):
     # Normalizes train and test data
 
-    train, test, pred_val = get_data(predict_ny)
+    train, test, pred_val = get_data(years_ago,predict_ny)
     train_X = train.as_matrix(columns = cols)
     train_y = train.as_matrix(columns=["P/82_next"])
-    names = test.as_matrix(columns=["Player","Season"])
+    names = test.as_matrix(columns=["Player","Age","Season"])
 
     test_X = test.as_matrix(columns=cols)
     test_y = test.as_matrix(columns=[pred_val])
+
 
     norm_train_x,norm_test_x = normalized(train_X.T,test_X.T)
 
