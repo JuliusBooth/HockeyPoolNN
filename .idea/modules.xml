@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/HockeyPool2017.iml" filepath="$PROJECT_DIR$/.idea/HockeyPool2017.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../JSONjoiner/.idea/JSONjoiner.iml" filepath="$PROJECT_DIR$/../JSONjoiner/.idea/JSONjoiner.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../.idea/Projects.iml" filepath="$PROJECT_DIR$/../.idea/Projects.iml" />
     </modules>
   </component>
 </project>

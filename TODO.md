@@ -1,11 +1,9 @@
 ## CODE
-
-- train all seasons for every player at once
--- might have to combine tables
-- use every stat
-- erase injuries from prediction/compenstae from them with a read out after removing injured players/ produce a per GP result instead?
+- teams stats
+- other versions of stats (from diff people)
+- use more stats
+- point share
 - make readME/even better comments
-
 - train for buildup in performace?? ie projected performance based on last 5 years? might be doing that if we do above
 
 ## Ideas

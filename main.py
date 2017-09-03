@@ -24,9 +24,9 @@ def run_network(save=True):
     # THE MAIN FUNCTION. SET ALL HYPER-PARAMETERS HERE.
 
     # Set predict_ny to True if you want to produce predictions for one year.
-    predict_ny = True
+    predict_ny = False
     # years_ago is the number of seasons ago you want to use to make future predictons for. years_ago = 1 = 2016/17
-    years_ago = 1
+    years_ago = 2
 
     # These are the input categories. It's important to list actual categories or NaNs are added to data and network breaks.
     input_categories = ["GP","TOI","G","A1","A","P","iCF","iFF","iSF","iSCF","ixG","iFOW",
@@ -53,7 +53,8 @@ def run_network(save=True):
     # However if there are layers with few neurons do not allow keep_prob to be too low.
     # Don't want to lose all neurons in a layer
     parameters = L_layer_model(train_set_x_orig, train_set_y, layers_dims,
-                    learning_rate=0.01, beta1=0.9,beta2=0.999,num_iterations=4002, keep_prob=0.94, print_cost=True)
+                               learning_rate=0.01, beta1=0.9, beta2=0.999, num_iterations=4002, keep_prob=0.94,
+                               print_cost=True)
 
 
     Y_prediction_test = predict(parameters, test_set_x_orig)
